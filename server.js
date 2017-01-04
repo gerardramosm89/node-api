@@ -22,7 +22,10 @@ app.get('/api/contacts/:id', (request, response) => {
   let contactId = request.params.id;
 
   let contact = contacts.filter(contact => {
-    return contact.id == contactId;
+		if (contact.id == contactId) {
+			contactId = contact;
+			return contactId
+		};
   });
 
   if (!contact) {
@@ -54,9 +57,8 @@ app.put('/api/contacts/:id', (request, response) => {
 
   let contact = contacts.filter(contact => {
     return contact.id == contactId;
-  })[0];
-
-  const index = contacts.indexOf(contact);
+	})[0];
+	const index = contacts.indexOf(contact);
 
   let keys = Object.keys(request.body);
 
@@ -65,15 +67,17 @@ app.put('/api/contacts/:id', (request, response) => {
   });
 
   contacts[index] = contact;
-
+	console.log("The index is: ", index);
   // response.json({ message: `User ${contactId} updated.`});
-  response.json(contacts[index]);
+	response.json(contacts[index]);
 });
 
 app.delete('/api/contacts/:id', (request, response) => {
   
   let contactId = request.params.id;
-
+	if (contactId > contacts.length + 1) {
+		return response.json("Not a valid ID, user doesn't exist");
+	} else {
   let contact = contacts.filter(contact => {
     return contact.id == contactId;
   })[0];
@@ -81,13 +85,15 @@ app.delete('/api/contacts/:id', (request, response) => {
   const index = contacts.indexOf(contact);
 
   contacts.splice(index, 1);
-
   response.json({ message: `User ${contactId} deleted.`});
-
+	}
 });
 
 const hostname = 'localhost';
 const port = 3001;
+app.get('*', function(req, res) {
+	  res.sendFile('./index.html', { root: __dirname });
+});
 
 const server = app.listen(port, hostname, () => {
 
